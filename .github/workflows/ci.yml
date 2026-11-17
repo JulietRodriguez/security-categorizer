@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  OSCAL_RELEASE: https://github.com/usnistgov/OSCAL/releases/download/v1.1.2
+  OSCAL_CONTENT: https://raw.githubusercontent.com/usnistgov/oscal-content/f0de6d8d8c059d374f15e0ae07508d82e370fc1d/nist.gov/SP800-53/rev5/json
+
+jobs:
+  lint:
+    name: Lint (Ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff==0.16.9
+      - run: ruff check .
+      - run: ruff format --check .
+
+  test:
+    name: Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install package and dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: Run tests with coverage
+        run: pytest --cov=security_categorizer --cov-report=term-missing
+
+  data:
+    name: Data matches its sources
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[data]"
+      - name: Committed source documents are identical to the official ones
+        run: |
+          mkdir -p /tmp/official
+          curl -sSfL https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-60v2r1.pdf \
+            -o /tmp/official/NIST.SP.800-60v2r1.pdf
+          for f in catalog LOW-baseline_profile MODERATE-baseline_profile HIGH-baseline_profile PRIVACY-baseline_profile; do
+            curl -sSfL "$OSCAL_CONTENT/NIST_SP-800-53_rev5_${f}-min.json" -o "/tmp/official/NIST_SP-800-53_rev5_${f}-min.json"
+          done
+          (cd /tmp/official && sha256sum -c "$GITHUB_WORKSPACE/sources/SHA256SUMS")
+          for f in /tmp/official/*; do cmp "$f" "sources/$(basename "$f")"; done
+      - name: Bundled data is regenerated identically from the sources
+        run: python tools/build_data.py --check
+      - name: Sample outputs match the code
+        run: python tools/make_samples.py --check
+
+  oscal-schema:
+    name: OSCAL 1.1.2 schema validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e . jsonschema
+      - name: Download NIST schemas and verify checksums
+        run: |
+          mkdir -p /tmp/nist
+          for f in ssp profile; do
+            curl -sSfL "$OSCAL_RELEASE/oscal_${f}_schema.json" -o "/tmp/nist/oscal_${f}_schema.json"
+          done
+          (cd /tmp/nist && sha256sum -c "$GITHUB_WORKSPACE/schemas/SHA256SUMS")
+          for f in /tmp/nist/*.json; do cmp "$f" "schemas/$(basename "$f")"; done
+      - name: Categorize every sample and validate the OSCAL output
+        run: |
+          for s in samples/*/system.yaml; do
+            name=$(basename "$(dirname "$s")")
+            security-categorizer categorize "$s" -o "out/$name"
+          done
+          security-categorizer categorize samples/nss/system.yaml --nss-data tests/fixtures/nss-data-SYNTHETIC.json \
+            -o out/nss-with-test-data
+          python tools/validate_oscal.py --schema-dir /tmp/nist out/*/baseline-profile.json out/*/system-characteristics.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: categorization-outputs
+          path: out/
