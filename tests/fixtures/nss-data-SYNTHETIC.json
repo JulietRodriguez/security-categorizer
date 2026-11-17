@@ -1,0 +1,13 @@
+{
+  "dataset": "SYNTHETIC test data in the CNSSI 1253 Appendix D format",
+  "source": {
+    "title": "SYNTHETIC (not CNSSI 1253 content; for tests only)",
+    "date": "2000-01-01"
+  },
+  "baselines": {
+    "confidentiality": {"low": ["ac-1", "ac-2"], "moderate": ["ac-1", "ac-2", "ac-3"], "high": ["ac-1", "ac-2", "ac-3", "ac-4"]},
+    "integrity": {"low": ["si-1"], "moderate": ["si-1", "si-2"], "high": ["si-1", "si-2", "si-7"]},
+    "availability": {"low": ["cp-1"], "moderate": ["cp-1", "cp-2"], "high": ["cp-1", "cp-2", "cp-7"]}
+  },
+  "privacy_baseline": ["pt-1"]
+}
