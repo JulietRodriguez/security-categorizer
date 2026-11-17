@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "security-categorizer"
+version = "0.1.0"
+description = "FIPS 199 / CNSSI 1253 security categorization from NIST SP 800-60 information types, with the matching control baseline and OSCAL output."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Juliet Rodriguez" }]
+keywords = ["fips-199", "cnssi-1253", "sp-800-60", "rmf", "categorization", "oscal", "nist-800-53b", "grc"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Security",
+]
+dependencies = ["PyYAML>=6.0"]
+
+[project.optional-dependencies]
+# Only needed to rebuild the bundled data from sources/ (tools/build_data.py).
+data = ["pypdf==6.17.0"]
+dev = ["pytest>=7.4", "pytest-cov>=4.1", "ruff==0.16.9", "jsonschema>=4.17", "pypdf==6.17.0"]
+
+[project.scripts]
+security-categorizer = "security_categorizer.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/JulietRodriguez/security-categorizer"
+Issues = "https://github.com/JulietRodriguez/security-categorizer/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+security_categorizer = ["data/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+addopts = "-ra"
+
+[tool.coverage.run]
+source = ["security_categorizer"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = ["src", "tests", "tools"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "C4", "PIE"]
+ignore = ["RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.per-file-ignores]
+# test data reads better on one line
+"tests/**" = ["E501"]

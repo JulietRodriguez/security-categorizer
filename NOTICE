@@ -1,0 +1,7 @@
+security-categorizer
+Copyright 2026 Juliet Rodriguez
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+sources/ holds unmodified copies of public U.S. Government documents (NIST, CNSS),
+which are not subject to copyright in the United States. See sources/SOURCES.md.
