@@ -1,0 +1,90 @@
+{
+  "tool": {
+    "name": "security-categorizer",
+    "version": "0.1.0"
+  },
+  "system": "SYNTHETIC Mission Planning System (MPS-DEMO)",
+  "mode": "nss",
+  "processes_pii": true,
+  "security_category": {
+    "confidentiality": "high",
+    "integrity": "moderate",
+    "availability": "low"
+  },
+  "fips199_statement": "SC SYNTHETIC Mission Planning System (MPS-DEMO) = {(confidentiality, HIGH), (integrity, MODERATE), (availability, LOW)}",
+  "information_types": [
+    {
+      "id": "C.3.5.8",
+      "title": "System and Network Monitoring Information Type",
+      "source": "nist-sp800-60v2r1",
+      "provisional": {
+        "confidentiality": "moderate",
+        "integrity": "moderate",
+        "availability": "low"
+      },
+      "final": {
+        "confidentiality": "moderate",
+        "integrity": "moderate",
+        "availability": "low"
+      },
+      "adjustments": [],
+      "source_footnotes": []
+    },
+    {
+      "id": "ORG-MPS-01",
+      "title": "Exercise plans",
+      "source": "SYNTHETIC organization-defined type",
+      "provisional": {
+        "confidentiality": "high",
+        "integrity": "moderate",
+        "availability": "low"
+      },
+      "final": {
+        "confidentiality": "high",
+        "integrity": "moderate",
+        "availability": "low"
+      },
+      "adjustments": [],
+      "source_footnotes": []
+    }
+  ],
+  "high_water_mark": {
+    "confidentiality": "high",
+    "integrity": "moderate",
+    "availability": "low"
+  },
+  "system_adjustments": [],
+  "baseline": {
+    "name": "CNSSI 1253 H-M-L (not selected)",
+    "source": "none: CNSSI 1253 Appendix D data was not supplied",
+    "control_count": 0,
+    "parts": {},
+    "pending_overlays": [
+      "Privacy Overlay",
+      "Classified Information Overlay"
+    ],
+    "notes": [
+      "Categorization H-M-L is complete, but no baseline was selected: CNSSI 1253 Appendix D baseline data is not bundled with this tool. Supply it with --nss-data (format in docs/data.md).",
+      "Overlays to apply: Privacy Overlay, Classified Information Overlay."
+    ],
+    "controls": []
+  },
+  "warnings": [],
+  "data": {
+    "information_types": "nist-sp800-60v2r1",
+    "source": {
+      "title": "NIST SP 800-60 Vol. 2 Rev. 1, Volume II: Appendices to Guide for Mapping Types of Information and Information Systems to Security Categories",
+      "published": "2008-08",
+      "status": "Final. Rev. 2 has been an initial working draft since January 2024 and is not used here.",
+      "url": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-60v2r1.pdf",
+      "doi": "https://doi.org/10.6028/NIST.SP.800-60v2r1",
+      "sha256": "0b4c5128b39a90f1bb1c1004f22bfe1fa34110222da740011f86c050983dc8de"
+    }
+  },
+  "approval": "This categorization is a draft prepared with security-categorizer. Under NIST SP 800-37 Rev. 2 (task C-2) the security categorization is reviewed and approved by the Authorizing Official or the AO's designated representative; for national security systems, CNSSI 1253 applies.",
+  "cnssi_1253_categorization": "H-M-L",
+  "overlays": [
+    "privacy",
+    "classified"
+  ]
+}

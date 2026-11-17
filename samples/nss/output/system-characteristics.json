@@ -1,0 +1,67 @@
+{
+  "system-name": "SYNTHETIC Mission Planning System (MPS-DEMO)",
+  "description": "Plans logistics for a fictional exercise.",
+  "props": [
+    {
+      "name": "generator",
+      "ns": "https://github.com/JulietRodriguez/security-categorizer/ns/oscal",
+      "value": "security-categorizer 0.1.0"
+    },
+    {
+      "name": "categorization-mode",
+      "ns": "https://github.com/JulietRodriguez/security-categorizer/ns/oscal",
+      "value": "nss"
+    },
+    {
+      "name": "cnssi-1253-categorization",
+      "ns": "https://github.com/JulietRodriguez/security-categorizer/ns/oscal",
+      "value": "H-M-L"
+    }
+  ],
+  "security-sensitivity-level": "fips-199-high",
+  "system-information": {
+    "information-types": [
+      {
+        "uuid": "af5604c9-a721-5c84-b183-193f802f888e",
+        "title": "System and Network Monitoring Information Type",
+        "description": "System and Network Monitoring Information Type (C.3.5.8), from nist-sp800-60v2r1.",
+        "categorizations": [
+          {
+            "system": "http://doi.org/10.6028/NIST.SP.800-60v2r1",
+            "information-type-ids": [
+              "C.3.5.8"
+            ]
+          }
+        ],
+        "confidentiality-impact": {
+          "base": "fips-199-moderate"
+        },
+        "integrity-impact": {
+          "base": "fips-199-moderate"
+        },
+        "availability-impact": {
+          "base": "fips-199-low"
+        }
+      },
+      {
+        "uuid": "de55b876-a0b8-581b-90b4-74b9d7c3613b",
+        "title": "Exercise plans",
+        "description": "Exercise plans (ORG-MPS-01), from SYNTHETIC organization-defined type.",
+        "confidentiality-impact": {
+          "base": "fips-199-high"
+        },
+        "integrity-impact": {
+          "base": "fips-199-moderate"
+        },
+        "availability-impact": {
+          "base": "fips-199-low"
+        }
+      }
+    ]
+  },
+  "security-impact-level": {
+    "security-objective-confidentiality": "fips-199-high",
+    "security-objective-integrity": "fips-199-moderate",
+    "security-objective-availability": "fips-199-low"
+  }
+}

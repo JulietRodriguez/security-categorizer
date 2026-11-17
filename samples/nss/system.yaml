@@ -1,0 +1,17 @@
+# SYNTHETIC sample: an invented national security system. No real system data.
+system:
+  name: SYNTHETIC Mission Planning System (MPS-DEMO)
+  short_name: MPS-DEMO
+  description: Plans logistics for a fictional exercise.
+mode: nss
+processes_pii: true        # adds the Privacy Overlay automatically
+overlays: [classified]
+information_types:
+  - id: C.3.5.8            # System and Network Monitoring (M/M/L)
+  - custom:
+      id: ORG-MPS-01
+      title: Exercise plans
+      confidentiality: high
+      integrity: moderate
+      availability: low
+      source: SYNTHETIC organization-defined type

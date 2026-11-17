@@ -1,0 +1,121 @@
+{
+  "system-name": "SYNTHETIC Flood Warning System (FWS-DEMO)",
+  "description": "Collects river-gauge data and issues flood warnings for a fictional region.",
+  "props": [
+    {
+      "name": "generator",
+      "ns": "https://github.com/JulietRodriguez/security-categorizer/ns/oscal",
+      "value": "security-categorizer 0.1.0"
+    },
+    {
+      "name": "categorization-mode",
+      "ns": "https://github.com/JulietRodriguez/security-categorizer/ns/oscal",
+      "value": "federal"
+    },
+    {
+      "name": "system-level-adjustments",
+      "ns": "https://github.com/JulietRodriguez/security-categorizer/ns/oscal",
+      "value": "confidentiality low->moderate: Aggregation: combined gauge locations and outage history reveal weak points in the regional warning network."
+    }
+  ],
+  "security-sensitivity-level": "fips-199-high",
+  "system-information": {
+    "information-types": [
+      {
+        "uuid": "eaa28e6a-04dd-5ea1-999c-a410e0231bd0",
+        "title": "Disaster Monitoring and Prediction Information Type",
+        "description": "Disaster Monitoring and Prediction Information Type (D.4.1), from nist-sp800-60v2r1.",
+        "categorizations": [
+          {
+            "system": "http://doi.org/10.6028/NIST.SP.800-60v2r1",
+            "information-type-ids": [
+              "D.4.1"
+            ]
+          }
+        ],
+        "confidentiality-impact": {
+          "base": "fips-199-low"
+        },
+        "integrity-impact": {
+          "base": "fips-199-high"
+        },
+        "availability-impact": {
+          "base": "fips-199-high"
+        }
+      },
+      {
+        "uuid": "4b548e1b-f2ce-573f-af92-d3c280845377",
+        "title": "Emergency Response Information Type",
+        "description": "Emergency Response Information Type (D.4.4), from nist-sp800-60v2r1.",
+        "categorizations": [
+          {
+            "system": "http://doi.org/10.6028/NIST.SP.800-60v2r1",
+            "information-type-ids": [
+              "D.4.4"
+            ]
+          }
+        ],
+        "confidentiality-impact": {
+          "base": "fips-199-low"
+        },
+        "integrity-impact": {
+          "base": "fips-199-high"
+        },
+        "availability-impact": {
+          "base": "fips-199-high"
+        }
+      },
+      {
+        "uuid": "61d2413c-59f5-5bda-b052-130c2254bbbd",
+        "title": "Facilities, Fleet, and Equipment Management Information Type",
+        "description": "Facilities, Fleet, and Equipment Management Information Type (C.3.1.1), from nist-sp800-60v2r1.",
+        "categorizations": [
+          {
+            "system": "http://doi.org/10.6028/NIST.SP.800-60v2r1",
+            "information-type-ids": [
+              "C.3.1.1"
+            ]
+          }
+        ],
+        "confidentiality-impact": {
+          "base": "fips-199-low"
+        },
+        "integrity-impact": {
+          "base": "fips-199-low"
+        },
+        "availability-impact": {
+          "base": "fips-199-low"
+        }
+      },
+      {
+        "uuid": "4fb133f5-f62f-5f18-a4ba-11406a896c5c",
+        "title": "System and Network Monitoring Information Type",
+        "description": "System and Network Monitoring Information Type (C.3.5.8), from nist-sp800-60v2r1.",
+        "categorizations": [
+          {
+            "system": "http://doi.org/10.6028/NIST.SP.800-60v2r1",
+            "information-type-ids": [
+              "C.3.5.8"
+            ]
+          }
+        ],
+        "confidentiality-impact": {
+          "base": "fips-199-moderate",
+          "selected": "fips-199-low",
+          "adjustment-justification": "The monitoring data in this system is limited to public gauge-station health; no security-sensitive network data is stored. Lowering requires AO review."
+        },
+        "integrity-impact": {
+          "base": "fips-199-moderate"
+        },
+        "availability-impact": {
+          "base": "fips-199-low"
+        }
+      }
+    ]
+  },
+  "security-impact-level": {
+    "security-objective-confidentiality": "fips-199-moderate",
+    "security-objective-integrity": "fips-199-high",
+    "security-objective-availability": "fips-199-high"
+  }
+}

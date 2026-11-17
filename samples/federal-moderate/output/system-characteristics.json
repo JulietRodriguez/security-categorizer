@@ -1,0 +1,86 @@
+{
+  "system-name": "SYNTHETIC Case Management System (CMS-DEMO)",
+  "description": "Tracks case files and their status for a fictional agency.",
+  "props": [
+    {
+      "name": "generator",
+      "ns": "https://github.com/JulietRodriguez/security-categorizer/ns/oscal",
+      "value": "security-categorizer 0.1.0"
+    },
+    {
+      "name": "categorization-mode",
+      "ns": "https://github.com/JulietRodriguez/security-categorizer/ns/oscal",
+      "value": "federal"
+    }
+  ],
+  "security-sensitivity-level": "fips-199-moderate",
+  "system-information": {
+    "information-types": [
+      {
+        "uuid": "0f0c4a1a-c065-5a89-8af1-194b0a2c0e23",
+        "title": "System and Network Monitoring Information Type",
+        "description": "System and Network Monitoring Information Type (C.3.5.8), from nist-sp800-60v2r1.",
+        "categorizations": [
+          {
+            "system": "http://doi.org/10.6028/NIST.SP.800-60v2r1",
+            "information-type-ids": [
+              "C.3.5.8"
+            ]
+          }
+        ],
+        "confidentiality-impact": {
+          "base": "fips-199-moderate"
+        },
+        "integrity-impact": {
+          "base": "fips-199-moderate"
+        },
+        "availability-impact": {
+          "base": "fips-199-low"
+        }
+      },
+      {
+        "uuid": "218049d5-f604-50e0-aafc-312b40388a79",
+        "title": "Corrective Action Information Type",
+        "description": "Corrective Action Information Type (C.2.1.1), from nist-sp800-60v2r1.",
+        "categorizations": [
+          {
+            "system": "http://doi.org/10.6028/NIST.SP.800-60v2r1",
+            "information-type-ids": [
+              "C.2.1.1"
+            ]
+          }
+        ],
+        "confidentiality-impact": {
+          "base": "fips-199-low"
+        },
+        "integrity-impact": {
+          "base": "fips-199-low",
+          "selected": "fips-199-moderate",
+          "adjustment-justification": "Corrective-action records drive case closure decisions; undetected changes would produce wrong outcomes for the people the cases concern."
+        },
+        "availability-impact": {
+          "base": "fips-199-low"
+        }
+      },
+      {
+        "uuid": "ff4300ee-d291-55f6-ba35-e59ee5d6dc7a",
+        "title": "Case records",
+        "description": "Case records (ORG-CMS-01), from SYNTHETIC agency supplement to SP 800-60.",
+        "confidentiality-impact": {
+          "base": "fips-199-moderate"
+        },
+        "integrity-impact": {
+          "base": "fips-199-moderate"
+        },
+        "availability-impact": {
+          "base": "fips-199-low"
+        }
+      }
+    ]
+  },
+  "security-impact-level": {
+    "security-objective-confidentiality": "fips-199-moderate",
+    "security-objective-integrity": "fips-199-moderate",
+    "security-objective-availability": "fips-199-low"
+  }
+}

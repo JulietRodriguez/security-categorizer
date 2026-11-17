@@ -1,0 +1,24 @@
+# SYNTHETIC sample: an invented system. No real system data.
+system:
+  name: SYNTHETIC Flood Warning System (FWS-DEMO)
+  short_name: FWS-DEMO
+  description: Collects river-gauge data and issues flood warnings for a fictional region.
+mode: federal
+processes_pii: false
+information_types:
+  - id: D.4.1              # Disaster Monitoring and Prediction (L/H/H)
+  - id: D.4.4              # Emergency Response (L/H/H)
+  - id: C.3.1.1            # Facilities, Fleet, and Equipment Management (L/L/L, footnoted)
+  - id: C.3.5.8            # System and Network Monitoring (M/M/L)
+    adjustments:
+      - objective: confidentiality
+        level: low
+        justification: >-
+          The monitoring data in this system is limited to public gauge-station health;
+          no security-sensitive network data is stored. Lowering requires AO review.
+system_adjustments:
+  - objective: confidentiality
+    level: moderate
+    justification: >-
+      Aggregation: combined gauge locations and outage history reveal weak points in the
+      regional warning network.

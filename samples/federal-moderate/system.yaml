@@ -1,0 +1,23 @@
+# SYNTHETIC sample: an invented system. No real system data.
+system:
+  name: SYNTHETIC Case Management System (CMS-DEMO)
+  short_name: CMS-DEMO
+  description: Tracks case files and their status for a fictional agency.
+mode: federal
+processes_pii: true
+information_types:
+  - id: C.3.5.8            # System and Network Monitoring (M/M/L)
+  - id: C.2.1.1            # Corrective Action (L/L/L)
+    adjustments:
+      - objective: integrity
+        level: moderate
+        justification: >-
+          Corrective-action records drive case closure decisions; undetected changes would
+          produce wrong outcomes for the people the cases concern.
+  - custom:
+      id: ORG-CMS-01
+      title: Case records
+      confidentiality: moderate
+      integrity: moderate
+      availability: low
+      source: SYNTHETIC agency supplement to SP 800-60
