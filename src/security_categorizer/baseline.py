@@ -11,8 +11,9 @@ the NSS Privacy Control Baseline, which CNSSI 1253 applies to every NSS.
 Overlays (Privacy, Classified, ...) change that list further; their content is
 not bundled, so they are listed as still to be applied.
 
-CNSSI 1253 Appendix D data is not bundled (see docs/design-notes.md). Pass it
-with --nss-data; without it, nss mode still categorizes but selects no baseline.
+CNSSI 1253 Appendix D data is not bundled (see docs/design-notes.md). Build it from
+your own copy of the PDF with tools/build_nss_data.py and pass it with --nss-data;
+without it, nss mode still categorizes but selects no baseline.
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ import re
 from dataclasses import dataclass, field
 
 from security_categorizer.categorize import Categorization
-from security_categorizer.datasets import control_title, sp800_53b
+from security_categorizer.datasets import control_title, nss_data_status, sp800_53b
 from security_categorizer.levels import OBJECTIVES
 from security_categorizer.system import KNOWN_OVERLAYS
 
@@ -87,7 +88,8 @@ def _nss(cat: Categorization, data: dict | None) -> BaselineSelection:
             pending_overlays=pending,
             notes=[
                 f"Categorization {cat.trigraph} is complete, but no baseline was selected: CNSSI 1253 Appendix D "
-                "baseline data is not bundled with this tool. Supply it with --nss-data (format in docs/data.md).",
+                "baseline data is not bundled with this tool. Build it from your copy of CNSSI 1253 with "
+                "tools/build_nss_data.py and pass it with --nss-data (see docs/data.md).",
                 "Overlays to apply: " + (", ".join(pending) if pending else "none declared") + ".",
             ],
         )
@@ -106,6 +108,23 @@ def _nss(cat: Categorization, data: dict | None) -> BaselineSelection:
         "CNSSI 1253 does not use a single high-water mark.",
         "This is the starting point: apply overlays, then tailor, before control implementation.",
     ]
+    sha = data.get("source", {}).get("sha256")
+    if nss_data_status(data) == "verified":
+        notes.append(
+            f"Appendix D data extracted from the CNSSI 1253 PDF with SHA-256 {sha}, the copy this tool's "
+            "extraction was checked against; its control counts match."
+        )
+    else:
+        notes.append(
+            "Appendix D data is not from the PDF this tool's extraction was checked against"
+            + (f" (SHA-256 {sha})" if sha else "")
+            + "; review it before relying on the baseline."
+        )
+    if data.get("source_discrepancies"):
+        notes.append(
+            f"The data records {len(data['source_discrepancies'])} places where Appendix D disagrees with its own "
+            "legend or with SP 800-53B (see source_discrepancies in the data file)."
+        )
     if pending:
         notes.append(
             "Overlays still to apply (their control changes are not bundled with this tool): "
