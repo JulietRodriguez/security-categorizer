@@ -32,8 +32,11 @@ every control that follows.
      **SP 800-53B Low (149), Moderate (287) or High (370)** baseline, plus the **Privacy baseline
      (96)** when the system processes PII.
    - `nss`: C, I and A stay separate (for example **H-M-L**), as CNSSI 1253 (29 July 2022) requires.
-     The Privacy Overlay is added when the system processes PII, and you can declare other overlays.
-     The baseline is selected from CNSSI 1253 Appendix D data you supply. See [Limits](#limits).
+     Each objective selects its own column of CNSSI 1253 Appendix D, and the NSS Privacy Control
+     Baseline is added for every NSS. An H-M-L system gets **543** controls; a single high-water mark
+     (H-H-H) would give 607. The Privacy Overlay is added when the system processes PII, and you can
+     declare other overlays. The Appendix D data is built by a script from your own copy of
+     CNSSI 1253 (see [NSS baselines](#nss-baselines-cnssi-1253)).
 5. **Outputs:** the reports, the baseline list, an OSCAL baseline profile and an OSCAL
    system-characteristics section.
 
@@ -80,8 +83,47 @@ overlays: []                  # nss mode: classified, space, intelligence, cds (
 |---|---|
 | `--mode federal\|nss` | Override the mode in the file |
 | `--info-types FILE` | Use another information-type catalog (a future SP 800-60 revision, an agency supplement); format in [docs/data.md](docs/data.md) |
-| `--nss-data FILE` | CNSSI 1253 Appendix D baseline data for nss mode; format in [docs/data.md](docs/data.md) |
+| `--nss-data FILE` | CNSSI 1253 Appendix D baseline data for nss mode, built with `tools/build_nss_data.py`; format in [docs/data.md](docs/data.md) |
 | `-o DIR` | Write the output files |
+
+## NSS baselines (CNSSI 1253)
+
+CNSSI 1253 has no distribution statement, so this repository doesn't include the PDF or any table
+from it. Instead, a script reads Appendix D (Tables D-1 to D-20) from your copy:
+
+```bash
+pip install -e ".[nss]"                       # pinned pdfplumber
+python tools/build_nss_data.py CNSSI_1253.pdf -o cnssi-1253-appendix-d.json
+security-categorizer categorize samples/nss/system.yaml --nss-data cnssi-1253-appendix-d.json -o out/nss
+```
+
+The script places each "X", "+" and "--" mark by its position under the nine C/I/A × L/M/H columns
+and by the table's ruled row borders. It records the PDF's SHA-256, counts per column and per family,
+anything it couldn't place ("anomalies"), and every place where Appendix D disagrees with its own
+legend or with SP 800-53B ("source_discrepancies"). It doesn't guess.
+
+It was checked against the CNSSI 1253 PDF dated 29 July 2022 (the CNSS corrected copy of
+6 October 2022, SHA-256 `d876741dfb78c54cf21e1f8f966475bddb9df0d3fc8e935e5350862c246d1180`):
+
+| | Low | Moderate | High |
+|---|---:|---:|---:|
+| Confidentiality column | 273 | 319 | 397 |
+| Integrity column | 310 | 380 | 474 |
+| Availability column | 147 | 202 | 283 |
+
+Plus 93 controls in the NSS Privacy Control Baseline, out of 1,189 rows (182 withdrawn).
+No anomalies. 10 source discrepancies, recorded in the data:
+
+- **SA-15 and SC-7(8) at Moderate, SI-4(22) at High** are in NIST's SP 800-53B baseline (catalog
+  5.2.0), but Appendix D marks them "+" (added for NSS) instead of "X". Either NIST's baseline
+  changed after July 2022, or the mark doesn't follow the legend. The control is selected either way.
+- **7 controls in catalog 5.2.0 aren't in Appendix D** (IA-13 and its three enhancements, SA-15(13),
+  SA-24, SI-2(7)). Appendix D is older than that catalog release, so these are never selected.
+
+`load_nss_data` checks data built from that PDF against these counts and refuses it if they don't
+match (for example after a pdfplumber change). Data from any other source is used but flagged
+"not verified" in the report. With the PDF, `CNSSI_1253_PDF=CNSSI_1253.pdf pytest` runs 20 more
+tests that pin the per-family counts and spot-checked rows (see `tests/test_nss_data.py`).
 
 ## Outputs
 
@@ -101,7 +143,12 @@ system-characteristics file is a fragment, so it's validated inside the smallest
 |---|---|---|
 | [`federal-moderate`](samples/federal-moderate) | Moderate (M/M/L), 340 controls | PII adds the Privacy baseline; a justified raise; a custom information type |
 | [`federal-high`](samples/federal-high) | High (M/H/H), 370 controls | Mission types from SP 800-60 Appendix D; a lowered level (flagged); footnoted exceptions (flagged); a system-level raise for aggregation |
-| [`nss`](samples/nss) | H-M-L, baseline not selected | Per-objective categorization; Privacy Overlay added for PII; a declared Classified overlay |
+| [`nss`](samples/nss) | H-M-L; 543 controls with your CNSSI 1253 data (the committed output has none, see below) | Per-objective categorization; Privacy Overlay added for PII; a declared Classified overlay |
+
+The committed `nss` output stops before the baseline, because a selected CNSSI 1253 baseline is
+derived from Appendix D. Run the commands under [NSS baselines](#nss-baselines-cnssi-1253) to
+produce it locally. CI selects an NSS baseline from a SYNTHETIC test file to validate the OSCAL
+profile against NIST's schema.
 
 ## Data and versions
 
@@ -110,7 +157,7 @@ system-characteristics file is a fragment, so it's validated inside the smallest
 | NIST SP 800-60 Vol. 1 & 2 | Rev. 1 (August 2008), current final | Rev. 2 has been an initial working draft since January 2024. The catalog is swappable for when it's final |
 | NIST SP 800-53 Rev. 5 / SP 800-53B | Catalog release 5.2.0 (NIST OSCAL content) | Baselines and control titles |
 | FIPS 199 / FIPS 200 | 2004 / 2006 | The categorization and high-water-mark rules |
-| CNSSI No. 1253 | 29 July 2022 | Rules for nss mode; Appendix D tables not bundled |
+| CNSSI No. 1253 | 29 July 2022 | Rules for nss mode; Appendix D read from your copy by `tools/build_nss_data.py` (not redistributed) |
 
 Source documents are kept in [sources/](sources), and CI checks them against the official downloads.
 [`tools/build_data.py`](tools/build_data.py) turns them into the bundled JSON, and CI fails if the
@@ -127,18 +174,29 @@ Plain-language explanations are in [docs/design-notes.md](docs/design-notes.md).
 - **FIPS 199 rules are enforced.** No objective is ever below Low at system level, and a system-level
   change can't go below what the information types require.
 - **Two modes, because civilian and national security systems differ.** CNSSI 1253 does not use the
-  FIPS 200 high-water mark.
+  FIPS 200 high-water mark: each objective selects its own Appendix D column.
+- **NSS data is extracted by script and cross-checked, never typed in.** Two table readers agree on
+  the rows, and every "X" and "--" mark is checked against SP 800-53B.
 - **Outputs are OSCAL,** so the next RMF step reads the result instead of someone retyping it.
 
 ## Limits
 
-- **CNSSI 1253 Appendix D baselines are not bundled.** No official copy was downloadable from a public
-  source while this was built, and hand-typed baselines can't be verified. NSS mode still categorizes
-  fully; supply the Appendix D data with `--nss-data` to select the baseline.
-- Overlay contents (Privacy, Classified, and so on) are not bundled. Overlays are listed as still to apply.
+- **CNSSI 1253 data isn't redistributed.** The document has no distribution statement, so you build
+  the Appendix D data from your own copy. Without it, NSS mode categorizes but selects no baseline.
+- **CI can't run the real-data tests.** Without the PDF, CI tests the extractor on a generated
+  SYNTHETIC PDF and the NSS selection with SYNTHETIC data. The 20 real-data tests run where you have
+  the PDF.
+- **The extractor is built for the 29 July 2022 layout.** A future edition with a different table
+  layout may need changes. Its anomaly report and the count check say when something doesn't fit.
+- **Overlays aren't applied.** CNSSI 1253 publishes them separately from the Instruction (Appendix E
+  only describes them), so the Privacy, Classified and other overlays are listed as still to apply.
+  That includes the 27 SP 800-53B privacy controls that Appendix D leaves to the Privacy Overlay.
+- **NSS parameter values aren't included.** Appendix D also sets minimum parameter values; the tool
+  selects controls only.
 - Baselines are a starting point. Tailoring (SP 800-37 task S-2) and organization-defined parameter
   values are out of scope.
-- oscal-ssp-generator doesn't read `system-characteristics.json` yet; joining them is planned for rmf-toolchain.
+- oscal-ssp-generator doesn't read `system-characteristics.json` itself;
+  [rmf-toolchain](https://github.com/JulietRodriguez/rmf-toolchain) joins them.
 - Information types are matched by SP 800-60 ID or exact title. The tool doesn't infer which types a
   system processes.
 
@@ -150,6 +208,7 @@ pytest --cov=security_categorizer
 ruff check . && ruff format --check .
 python tools/build_data.py --check     # bundled data matches sources/
 python tools/make_samples.py --check   # sample outputs match the code
+CNSSI_1253_PDF=CNSSI_1253.pdf pytest tests/test_nss_data.py   # with your copy of CNSSI 1253
 ```
 
 CI runs lint, tests on Python 3.10–3.14, a data job (re-downloads the NIST sources, verifies

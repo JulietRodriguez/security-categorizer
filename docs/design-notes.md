@@ -70,18 +70,59 @@ Appendix D.
 confidentiality and Low availability doesn't need High-availability controls, and the per-objective
 approach avoids paying for them.
 
-## 7. CNSSI 1253 data is not bundled
+## 7. CNSSI 1253 data is built from your copy, not bundled
 
-**Choice:** `nss` mode categorizes fully (trigraph, overlays), but it selects a baseline only when
-you supply CNSSI 1253 Appendix D data with `--nss-data`. Without it, the report says the baseline
-was not selected, and why.
+**Choice:** `tools/build_nss_data.py` reads Appendix D (Tables D-1 to D-20) from a CNSSI 1253 PDF you
+supply and writes the `--nss-data` file. Neither the PDF nor the extracted tables are in this
+repository.
 
-**Why:** No official, downloadable copy of CNSSI 1253 (2022) was reachable from a public source
-while this was built: cnss.gov and the usual mirrors refused automated and browser downloads.
-Typing Appendix D's 20 tables in from memory or from an unofficial copy would produce data nobody
-can verify, and a wrong baseline is worse than none. So the tool documents the format
-(docs/data.md), tests the logic with a file clearly marked SYNTHETIC, and leaves the official
-data to the user.
+**Why not bundle it:** I read the document for a release statement before using it. It has none:
+no distribution line, no "approved for public release", no handling marking. The Foreword only says
+the Instruction "may be obtained from the CNSS website." That tells you where to get it, not that
+you can redistribute it. So the repository ships the extraction method and the checks, and each
+user runs them on a copy they got from CNSS. The same reasoning keeps the committed `nss` sample
+output short of the baseline.
+
+**How the extraction works:** Each table page has a header with nine L/M/H cells (low, moderate,
+high under C, I and A). Their x positions define the nine columns. Each mark ("X", "+", "--") is
+placed in the row whose ruled borders contain it, and in the column whose center it sits under.
+The NSS Privacy Control Baseline is the marked column left of the nine. A mark that fits no row,
+no column, or two of either is reported as an anomaly instead of being placed.
+
+Two layout problems came up on the real PDF, and both are handled in code, not by hand:
+
+- In the PM table, the marks sit a few points below the control ID, so "same text line" missed
+  them. The table's ruled row borders fixed it.
+- Page 136 continues Table D-18 without repeating the header, so SC-18(2) and SC-18(3) were
+  dropped at first. Cross-checking with a second reader (pypdf) caught the gap; the script now reuses the previous page's
+  columns and records which pages needed it.
+
+**How it's checked:** Three independent checks, because the extractor shouldn't be the only judge
+of its own output:
+
+1. A second reader (pdfplumber's ruled-grid table extraction) finds exactly the same 1,189
+   control rows in every family.
+2. The legend says "X" means "from the SP 800-53B baseline" and "--" means "in the NIST baseline
+   but not the NSS one". So at each level, the "X" and "--" marks should be exactly NIST's
+   baseline, which this tool already builds from NIST's own OSCAL. They are, except for 10
+   recorded discrepancies.
+3. Rows were compared with the rendered page by eye and pinned as spot checks.
+
+**Discrepancies are recorded, not fixed.** SA-15 and SC-7(8) (Moderate) and SI-4(22) (High) are
+in NIST's baseline in catalog 5.2.0, but marked "+" in Appendix D. The selection is the same
+either way, and I can't tell from the documents alone whether NIST changed its baseline after
+July 2022 or the mark breaks the legend, so both readings are written down. Seven controls in
+catalog 5.2.0 are not in Appendix D at all and are never selected.
+
+**Guarding against drift:** The tool knows the SHA-256 of the copy it was checked against and the
+counts that copy produces. If data built from that PDF doesn't match the counts (a different
+pdfplumber, say), `load_nss_data` refuses it. Data from any other source still works, but the
+report says it wasn't verified.
+
+**Trade-off:** CI can't run the real-data tests, because CI doesn't have the PDF. CI tests the
+extractor on a generated SYNTHETIC PDF, and the NSS selection and its OSCAL profile with SYNTHETIC
+data. The 20 tests that pin the real counts run wherever the PDF is available
+(`CNSSI_1253_PDF=... pytest`).
 
 ## 8. Privacy is handled, not guessed
 
@@ -108,8 +149,8 @@ systems with PII. The tool records the PII decision, but the SAOP or designee ap
 the result instead of someone retyping it. The fragment isn't a whole SSP, so CI validates it by
 wrapping it in the smallest SSP NIST's schema accepts.
 
-**Trade-off:** oscal-ssp-generator doesn't read this fragment yet; merging it is part of the planned
-rmf-toolchain repo.
+**Trade-off:** oscal-ssp-generator doesn't read this fragment itself; rmf-toolchain merges it into
+the SSP.
 
 ## 10. Draft for approval, not a decision
 
