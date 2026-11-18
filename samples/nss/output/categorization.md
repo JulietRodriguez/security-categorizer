@@ -27,7 +27,7 @@ A system objective is never below Low: FIPS 199 does not allow not-applicable fo
 
 ## Control baseline: CNSSI 1253 H-M-L (not selected) (no controls selected)
 
-- Categorization H-M-L is complete, but no baseline was selected: CNSSI 1253 Appendix D baseline data is not bundled with this tool. Supply it with --nss-data (format in docs/data.md).
+- Categorization H-M-L is complete, but no baseline was selected: CNSSI 1253 Appendix D baseline data is not bundled with this tool. Build it from your copy of CNSSI 1253 with tools/build_nss_data.py and pass it with --nss-data (see docs/data.md).
 - Overlays to apply: Privacy Overlay, Classified Information Overlay.
 
 ## Data sources

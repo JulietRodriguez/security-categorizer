@@ -4,6 +4,7 @@ import sys
 
 import pytest
 
+from security_categorizer import __version__
 from security_categorizer.cli import main
 from tests.conftest import NSS_DATA, ROOT, SAMPLES
 
@@ -91,7 +92,12 @@ def test_module_entry_point():
         check=False,
         env={"PYTHONPATH": str(ROOT / "src"), "PATH": ""},
     )
-    assert proc.returncode == 0 and "security-categorizer 0.1.0" in proc.stdout
+    assert proc.returncode == 0 and f"security-categorizer {__version__}" in proc.stdout
+
+
+def test_version_matches_pyproject():
+    text = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert f'\nversion = "{__version__}"\n' in text
 
 
 def test_samples_are_up_to_date():
