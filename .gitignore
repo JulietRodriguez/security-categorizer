@@ -11,3 +11,9 @@ venv/
 coverage.xml
 htmlcov/
 /out/
+
+# CNSSI 1253 has no distribution statement: keep your copy and the data built from it local.
+*.pdf
+!sources/*.pdf
+cnssi-1253-appendix-d.json
+/local/
