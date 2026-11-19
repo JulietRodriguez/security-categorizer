@@ -110,12 +110,33 @@ def sp800_53b() -> dict[str, Any]:
     return _read_json(None, "sp800_53b.json")
 
 
-def load_nss_data(path: str | Path) -> dict[str, Any]:
-    """Load CNSSI 1253 Appendix D baseline data that you supply (format in docs/data.md).
+# The copy of CNSSI 1253 that tools/build_nss_data.py was checked against, and what it extracts
+# from it. These are counts, not the tables: the tables stay with the user (no distribution
+# statement in the document). load_nss_data refuses data from this PDF whose lists don't
+# produce these counts, so a broken extraction (for example a different pdfplumber) is caught.
+VERIFIED_CNSSI_1253 = {
+    "sha256": "d876741dfb78c54cf21e1f8f966475bddb9df0d3fc8e935e5350862c246d1180",
+    "date": "29 July 2022",
+    "controls_listed": 1189,
+    "baselines": {
+        "confidentiality": {"low": 273, "moderate": 319, "high": 397},
+        "integrity": {"low": 310, "moderate": 380, "high": 474},
+        "availability": {"low": 147, "moderate": 202, "high": 283},
+    },
+    "privacy_baseline": 93,
+}
 
-    CNSSI 1253 is not bundled: no official machine-readable copy could be obtained
-    from a public source while this tool was built, and baselines typed in by hand
-    would be unverifiable. See docs/design-notes.md.
+
+def nss_data_status(data: dict[str, Any]) -> str:
+    """'verified' (extracted from the checked PDF, counts match), 'unverified' (other source)."""
+    return "verified" if data.get("source", {}).get("sha256") == VERIFIED_CNSSI_1253["sha256"] else "unverified"
+
+
+def load_nss_data(path: str | Path) -> dict[str, Any]:
+    """Load CNSSI 1253 Appendix D baseline data (format in docs/data.md).
+
+    Build it from your own copy of the PDF with tools/build_nss_data.py. CNSSI 1253 has no
+    distribution statement, so the data is not bundled; see docs/design-notes.md.
     """
     data = _read_json(Path(path), "")
     name = str(path)
@@ -132,6 +153,15 @@ def load_nss_data(path: str | Path) -> dict[str, Any]:
             raise TypeError("source.date is required")
     except (KeyError, TypeError) as exc:
         raise DataError(f"{name}: not valid CNSSI 1253 baseline data ({exc})") from exc
+    if nss_data_status(data) == "verified":
+        v = VERIFIED_CNSSI_1253
+        got = {o: {lv: len(set(baselines[o][lv])) for lv in ("low", "moderate", "high")} for o in OBJECTIVES}
+        if got != v["baselines"] or len(set(data["privacy_baseline"])) != v["privacy_baseline"]:
+            raise DataError(
+                f"{name}: extracted from the verified CNSSI 1253 PDF, but its baselines don't match the verified "
+                f"counts (got {got}, privacy {len(set(data['privacy_baseline']))}). Rebuild it with "
+                'tools/build_nss_data.py and the pinned pdfplumber (pip install "security-categorizer[nss]").'
+            )
     return data
 
 

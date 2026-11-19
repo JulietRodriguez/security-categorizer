@@ -1,7 +1,7 @@
 {
   "tool": {
     "name": "security-categorizer",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "system": "SYNTHETIC Mission Planning System (MPS-DEMO)",
   "mode": "nss",
@@ -64,7 +64,7 @@
       "Classified Information Overlay"
     ],
     "notes": [
-      "Categorization H-M-L is complete, but no baseline was selected: CNSSI 1253 Appendix D baseline data is not bundled with this tool. Supply it with --nss-data (format in docs/data.md).",
+      "Categorization H-M-L is complete, but no baseline was selected: CNSSI 1253 Appendix D baseline data is not bundled with this tool. Build it from your copy of CNSSI 1253 with tools/build_nss_data.py and pass it with --nss-data (see docs/data.md).",
       "Overlays to apply: Privacy Overlay, Classified Information Overlay."
     ],
     "controls": []

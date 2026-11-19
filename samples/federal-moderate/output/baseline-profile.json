@@ -4,13 +4,13 @@
     "metadata": {
       "title": "SP 800-53B Moderate + Privacy baseline for SYNTHETIC Case Management System (CMS-DEMO)",
       "last-modified": "2026-11-17T12:00:00+00:00",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "oscal-version": "1.1.2",
       "props": [
         {
           "name": "generator",
           "ns": "https://github.com/JulietRodriguez/security-categorizer/ns/oscal",
-          "value": "security-categorizer 0.1.0"
+          "value": "security-categorizer 0.2.0"
         },
         {
           "name": "baseline-source",

@@ -5,7 +5,7 @@
     {
       "name": "generator",
       "ns": "https://github.com/JulietRodriguez/security-categorizer/ns/oscal",
-      "value": "security-categorizer 0.1.0"
+      "value": "security-categorizer 0.2.0"
     },
     {
       "name": "categorization-mode",

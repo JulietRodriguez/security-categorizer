@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "security-categorizer"
-version = "0.1.0"
+version = "0.2.0"
 description = "FIPS 199 / CNSSI 1253 security categorization from NIST SP 800-60 information types, with the matching control baseline and OSCAL output."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -28,7 +28,17 @@ dependencies = ["PyYAML>=6.0"]
 [project.optional-dependencies]
 # Only needed to rebuild the bundled data from sources/ (tools/build_data.py).
 data = ["pypdf==6.17.0"]
-dev = ["pytest>=7.4", "pytest-cov>=4.1", "ruff==0.16.9", "jsonschema>=4.17", "pypdf==6.17.0"]
+# Only needed to build CNSSI 1253 baseline data from your copy of the PDF (tools/build_nss_data.py).
+nss = ["pdfplumber==0.11.10"]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff==0.16.9",
+    "jsonschema>=4.17",
+    "pypdf==6.17.0",
+    "pdfplumber==0.11.10",
+    "reportlab>=4.0",
+]
 
 [project.scripts]
 security-categorizer = "security_categorizer.cli:main"
